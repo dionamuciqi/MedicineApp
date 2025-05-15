@@ -10,11 +10,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.google.android.material.badge.BadgeUtils;
 
 public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase db;
@@ -31,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(MainActivity.this, Register.class);
             startActivity(intent);
         });
+
         Button forgot = findViewById(R.id.button_forgot_password);
         forgot.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, ForgotPasswordActivity.class);
@@ -48,19 +44,23 @@ public class MainActivity extends AppCompatActivity {
             EditText password = findViewById(R.id.input_password);
             String passwordText = password.getText().toString();
 
-            if(emailText.isEmpty() && passwordText.isEmpty()) {
+            if (emailText.isEmpty() && passwordText.isEmpty()) {
                 Toast.makeText(this, "Please Enter Your Email And Password", Toast.LENGTH_SHORT).show();
                 return;
             }
+
+            // Hashing the password before comparing
+            String hashedPassword = PasswordHasher.generateHash(passwordText);
 
             String[] projection = {
                     "id",
                     "fullName",
                     "userEmail",
-                    "password"};
+                    "password"
+            };
 
             String selection = "userEmail = ? AND password = ?";
-            String[] selectionArgs = {emailText, passwordText};
+            String[] selectionArgs = {emailText, hashedPassword};
 
             Cursor cursor = db.query(
                     "users",
@@ -69,20 +69,23 @@ public class MainActivity extends AppCompatActivity {
                     selectionArgs,
                     null,
                     null,
-                    null);
-            if(cursor.getCount()>0){
+                    null
+            );
+
+            if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 String fullName = cursor.getString(cursor.getColumnIndexOrThrow("fullName"));
 
-                if(emailText.equals("admin@123.com")) {
+                if (emailText.equals("admin@123.com")) {
                     Toast.makeText(this, "Welcome Admin", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, AdminActivity.class);
                     startActivity(intent);
-                }else {
+                } else {
                     Toast.makeText(this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(MainActivity.this, Home.class);
                     startActivity(intent);
                 }
+
                 email.setText("");
                 password.setText("");
             } else {
@@ -90,11 +93,12 @@ public class MainActivity extends AppCompatActivity {
                 password.setText("");
             }
 
-            if(!cursor.isClosed()) {
+            if (!cursor.isClosed()) {
                 cursor.close();
             }
         });
     }
+
     @Override
     protected void onDestroy() {
         super.onDestroy();

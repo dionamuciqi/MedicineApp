@@ -118,7 +118,8 @@ public class Register extends AppCompatActivity {
             values.put("userEmail", userEmailText);
             values.put("mobile", mobileText);
             values.put("address", addressText);
-            values.put("password", passwordText);
+            String hashedPassword = PasswordHasher.generateHash(passwordText);
+            values.put("password", hashedPassword);
 
             long newRowId = db.insert("users", null, values);
             if (newRowId == -1) {
