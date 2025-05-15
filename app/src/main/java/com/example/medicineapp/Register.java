@@ -4,6 +4,9 @@ import android.content.ContentValues;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Patterns;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -13,16 +16,10 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
-
-import com.example.medicineapp.MainActivity;
-
-import java.lang.reflect.Array;
 
 public class Register extends AppCompatActivity {
     private SQLiteDatabase db;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -37,6 +34,7 @@ public class Register extends AppCompatActivity {
             Intent intent = new Intent(Register.this, MainActivity.class);
             startActivity(intent);
         });
+
         Spinner genderSpinner = findViewById(R.id.gender);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(
                 this,
@@ -46,38 +44,74 @@ public class Register extends AppCompatActivity {
         adapter.setDropDownViewResource(R.layout.spinner_dropdown_item);
         genderSpinner.setAdapter(adapter);
 
+        EditText fullName = findViewById(R.id.input_fullName);
+        EditText userEmail = findViewById(R.id.input_userEmail);
+        EditText mobile = findViewById(R.id.inputMobile);
+        EditText address = findViewById(R.id.inputAddress);
+        EditText password = findViewById(R.id.input_password);
+        EditText confirmPassword = findViewById(R.id.confirm_password);
+        Spinner gender = findViewById(R.id.gender);
         Button registerButton = findViewById(R.id.register_button);
+
+        // Real-time password validation
+        password.addTextChangedListener(new TextWatcher() {
+            @Override public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+            @Override public void onTextChanged(CharSequence s, int start, int before, int count) {
+                String pwd = s.toString();
+                if (!isValidPassword(pwd)) {
+                    password.setError("Password must be 6-20 characters, include 1 digit, 1 uppercase, 1 lowercase, and 1 special character");
+                } else {
+                    password.setError(null);
+                }
+            }
+            @Override public void afterTextChanged(Editable s) {}
+        });
+
         registerButton.setOnClickListener(v -> {
-            EditText fullName = findViewById(R.id.input_fullName);
-            String fullNameText = fullName.getText().toString();
-
-            Spinner gender = findViewById(R.id.gender);
+            String fullNameText = fullName.getText().toString().trim();
             String genderText = gender.getSelectedItem().toString();
-
-            EditText userEmail = findViewById(R.id.input_userEmail);
-            String userEmailText = userEmail.getText().toString();
-
-            EditText mobile = findViewById(R.id.inputMobile);
-            String mobileText = mobile.getText().toString();
-
-            EditText address = findViewById(R.id.inputAddress);
-            String addressText = address.getText().toString();
-
-            EditText password = findViewById(R.id.input_password);
+            String userEmailText = userEmail.getText().toString().trim();
+            String mobileText = mobile.getText().toString().trim();
+            String addressText = address.getText().toString().trim();
             String passwordText = password.getText().toString();
-
-            EditText confirmPassword = findViewById(R.id.confirm_password);
             String confirmPasswordText = confirmPassword.getText().toString();
 
-            if(fullNameText.isEmpty() && genderText.isEmpty() && userEmailText.isEmpty() && mobileText.isEmpty() && addressText.isEmpty() && passwordText.isEmpty() && confirmPasswordText.isEmpty()) {
-                Toast.makeText(this, "Please Fill in all Fields", Toast.LENGTH_SHORT).show();
+            if (fullNameText.isEmpty()) {
+                fullName.setError("Full name is required");
                 return;
             }
 
-            if(!passwordText.equals(confirmPasswordText)) {
-                Toast.makeText(this, "Password does not match", Toast.LENGTH_SHORT).show();
+            if (userEmailText.isEmpty()) {
+                userEmail.setError("Email is required");
+                return;
+            } else if (!Patterns.EMAIL_ADDRESS.matcher(userEmailText).matches()) {
+                userEmail.setError("Enter a valid email");
                 return;
             }
+
+            if (mobileText.isEmpty()) {
+                mobile.setError("Mobile number is required");
+                return;
+            }
+
+            if (addressText.isEmpty()) {
+                address.setError("Address is required");
+                return;
+            }
+
+            if (passwordText.isEmpty()) {
+                password.setError("Password is required");
+                return;
+            } else if (!isValidPassword(passwordText)) {
+                password.setError("Password must be 6-20 characters, include 1 digit, 1 uppercase, 1 lowercase, and 1 special character");
+                return;
+            }
+
+            if (!passwordText.equals(confirmPasswordText)) {
+                confirmPassword.setError("Passwords do not match");
+                return;
+            }
+
             ContentValues values = new ContentValues();
             values.put("fullName", fullNameText);
             values.put("gender", genderText);
@@ -87,23 +121,27 @@ public class Register extends AppCompatActivity {
             values.put("password", passwordText);
 
             long newRowId = db.insert("users", null, values);
-
-            if (newRowId == -1){
+            if (newRowId == -1) {
                 Toast.makeText(this, "Error inserting data", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "User Created successfully", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "User created successfully", Toast.LENGTH_SHORT).show();
                 Intent intent = new Intent(Register.this, MainActivity.class);
                 startActivity(intent);
             }
         });
-
     }
+
+    // Password validation function
+    private boolean isValidPassword(String password) {
+        String passwordPattern = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[@#$%^&+=!])(?=\\S+$).{6,20}$";
+        return password.matches(passwordPattern);
+    }
+
+    @Override
     protected void onDestroy() {
         super.onDestroy();
         if (db != null && db.isOpen()) {
             db.close();
-
         }
-
     }
 }
