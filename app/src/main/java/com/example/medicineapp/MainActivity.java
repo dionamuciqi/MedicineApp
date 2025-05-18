@@ -49,7 +49,6 @@ public class MainActivity extends AppCompatActivity {
                 return;
             }
 
-            // Hashing the password before comparing
             String hashedPassword = PasswordHasher.generateHash(passwordText);
 
             String[] projection = {
@@ -76,15 +75,9 @@ public class MainActivity extends AppCompatActivity {
                 cursor.moveToFirst();
                 String fullName = cursor.getString(cursor.getColumnIndexOrThrow("fullName"));
 
-                if (emailText.equals("admin@123.com")) {
-                    Toast.makeText(this, "Welcome Admin", Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, AdminActivity.class);
-                    startActivity(intent);
-                } else {
-                    Toast.makeText(this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
-                    Intent intent = new Intent(MainActivity.this, Home.class);
-                    startActivity(intent);
-                }
+                Toast.makeText(this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
+                Intent intent = new Intent(MainActivity.this, Home.class);
+                startActivity(intent);
 
                 email.setText("");
                 password.setText("");
