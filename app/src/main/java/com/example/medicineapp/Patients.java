@@ -52,14 +52,21 @@ public class Patients extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 if (edName.length() > 0 && edDesc.length() > 0) {
-                    dbHelper.insertData(edName.getText().toString(), edDesc.getText().toString());
+                    int userId = getIntent().getIntExtra("userId", -1);
+
+                    dbHelper.insertPatient(edName.getText().toString(), edDesc.getText().toString(), userId);
+
                     Toast.makeText(Patients.this, "Data successfully added", Toast.LENGTH_SHORT).show();
 
                     showNotification();
 
                     edName.setText("");
                     edDesc.setText("");
-                    startActivity(new Intent(Patients.this, Home.class));
+
+                    // Kalo userId te Home activity
+                    Intent intent = new Intent(Patients.this, Home.class);
+                    intent.putExtra("userId", userId);
+                    startActivity(intent);
                 } else {
                     Toast.makeText(Patients.this, "Please fill in all fields", Toast.LENGTH_SHORT).show();
                 }
@@ -69,7 +76,10 @@ public class Patients extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        startActivity(new Intent(Patients.this, Home.class));
+        int userId = getIntent().getIntExtra("userId", -1);
+        Intent intent = new Intent(Patients.this, Home.class);
+        intent.putExtra("userId", userId);
+        startActivity(intent);
         super.onBackPressed();
     }
 

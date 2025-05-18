@@ -21,47 +21,69 @@ public class MyDbHelper extends SQLiteOpenHelper {
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "fullName TEXT," +
                 "gender TEXT," +
-                "userEmail TEXT," +
+                "userEmail TEXT UNIQUE," +
                 "mobile TEXT," +
                 "address TEXT," +
                 "password TEXT)");
 
-        db.execSQL("CREATE TABLE my_table(" +
+        db.execSQL("CREATE TABLE patients(" +
                 "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "userId INTEGER," +
                 "fullname TEXT," +
-                "diagnostic TEXT)");
+                "diagnostic TEXT," +
+                "FOREIGN KEY(userId) REFERENCES users(id) ON DELETE CASCADE)");
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS patients");
         db.execSQL("DROP TABLE IF EXISTS users");
-        db.execSQL("DROP TABLE IF EXISTS my_table");
         onCreate(db);
     }
 
-    public void insertData(String fullName, String diagnostic) {
+    // User CRUD
+    public long insertUser(String fullName, String gender, String email, String mobile, String address, String password) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("fullname", fullName);
-        values.put("diagnostic", diagnostic);
-        db.insert("my_table", null, values);
+        values.put("fullName", fullName);
+        values.put("gender", gender);
+        values.put("userEmail", email);
+        values.put("mobile", mobile);
+        values.put("address", address);
+        values.put("password", password);
+        return db.insert("users", null, values);
     }
 
-    public Cursor showData() {
+    public Cursor getUserByEmailPassword(String email, String password) {
         SQLiteDatabase db = this.getReadableDatabase();
-        return db.rawQuery("SELECT * FROM my_table ORDER BY id DESC", null);
+        return db.rawQuery("SELECT * FROM users WHERE userEmail=? AND password=?", new String[]{email, password});
     }
 
-    public void deleteData(String id) {
-        SQLiteDatabase db = this.getWritableDatabase();
-        db.delete("my_table", "id=?", new String[]{id});
-    }
-
-    public void updateData(String fullName, String diagnostic, String id) {
+    // Patients CRUD
+    public long insertPatient(String fullname, String diagnostic, int userId) {
         SQLiteDatabase db = this.getWritableDatabase();
         ContentValues values = new ContentValues();
-        values.put("fullname", fullName);
+        values.put("fullname", fullname);
         values.put("diagnostic", diagnostic);
-        db.update("my_table", values, "id=?", new String[]{id});
+        values.put("userId", userId);
+        return db.insert("patients", null, values);
+    }
+
+    public Cursor getPatientsByUserId(int userId) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        return db.rawQuery("SELECT * FROM patients WHERE userId=? ORDER BY id DESC", new String[]{String.valueOf(userId)});
+    }
+
+    public void deletePatient(String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.delete("patients", "id=?", new String[]{id});
+    }
+
+    public int updatePatient(String fullname, String diagnostic, String id) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put("fullname", fullname);
+        values.put("diagnostic", diagnostic);
+        return db.update("patients", values, "id=?", new String[]{id});
     }
 }

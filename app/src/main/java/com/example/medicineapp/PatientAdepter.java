@@ -50,7 +50,7 @@ public class PatientAdepter extends RecyclerView.Adapter<PatientAdepter.ViewHold
                                 public void onClick(DialogInterface dialogInterface, int i) {
                                     MyDbHelper dbHelper = new MyDbHelper(context);
                                     String id = String.valueOf(arrayList.get(currentPosition).getId());
-                                    dbHelper.deleteData(id);
+                                    dbHelper.deletePatient(id);
                                     dialogInterface.dismiss();
                                     context.startActivity(new Intent(context, Home.class));
                                 }

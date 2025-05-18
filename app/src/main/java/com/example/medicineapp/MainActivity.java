@@ -4,8 +4,11 @@ import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
@@ -20,6 +23,15 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
+
+        ImageView loginImage = findViewById(R.id.loginImage);
+        ImageView shapeImage = findViewById(R.id.shape);
+
+        Animation fadeInOnce = AnimationUtils.loadAnimation(this, R.anim.fade_in_once);
+        Animation rotateForever = AnimationUtils.loadAnimation(this, R.anim.rotate_shape);
+
+        loginImage.startAnimation(fadeInOnce);
+        shapeImage.startAnimation(rotateForever);
 
         Button register = findViewById(R.id.button_register);
         register.setOnClickListener(v -> {
@@ -74,9 +86,10 @@ public class MainActivity extends AppCompatActivity {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 String fullName = cursor.getString(cursor.getColumnIndexOrThrow("fullName"));
-
                 Toast.makeText(this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
+                int userId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
                 Intent intent = new Intent(MainActivity.this, Home.class);
+                intent.putExtra("userId", userId);
                 startActivity(intent);
 
                 email.setText("");
