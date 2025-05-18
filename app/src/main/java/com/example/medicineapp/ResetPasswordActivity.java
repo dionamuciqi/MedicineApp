@@ -11,9 +11,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class ResetPasswordActivity extends AppCompatActivity {
 
@@ -25,7 +22,7 @@ public class ResetPasswordActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_reset_password);
 
-        MyDbHelper dbHelper = new MyDbHelper(this, "medicine.db", null, 1);
+        MyDbHelper dbHelper = new MyDbHelper(this);
         db = dbHelper.getWritableDatabase();
 
         EditText newPassword = findViewById(R.id.input_new_password);

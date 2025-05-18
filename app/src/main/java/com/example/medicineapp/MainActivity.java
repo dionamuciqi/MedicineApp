@@ -33,7 +33,7 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        dbHelper = new MyDbHelper(this, "medicine.db", null, 1);
+        dbHelper = new MyDbHelper(this);
         db = dbHelper.getWritableDatabase();
 
         Button login = findViewById(R.id.button_login);

@@ -11,9 +11,6 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 public class ForgotPasswordActivity extends AppCompatActivity {
     private SQLiteDatabase db;
@@ -22,7 +19,7 @@ public class ForgotPasswordActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_forgot_password);
-        MyDbHelper dbHelper = new MyDbHelper(this, "medicine.db", null, 1);
+        MyDbHelper dbHelper = new MyDbHelper(this);
         db = dbHelper.getWritableDatabase();
 
         TextView backToLogin = findViewById(R.id.back_to_login);

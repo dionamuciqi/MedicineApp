@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Patients">
+
+
+    <TextView
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:layout_width="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginTop="25dp"
+        android:textSize="18sp"
+        android:text="Add Patients"
+        android:textColor="@color/deep_blue"
+        android:textStyle="bold"
+        android:layout_height="wrap_content"/>
+
+
+    <EditText
+        android:layout_gravity="center"
+        android:clickable="true"
+        android:foreground="?attr/selectableItemBackground"
+        android:elevation="2dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/edit_shape"
+        android:hint="FullName"
+        android:id="@+id/edName"
+        android:paddingLeft="10dp"
+        android:inputType="textPersonName"
+        android:textColor="@color/deep_blue"
+        android:textColorHint="@color/deep_blue"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"/>
+
+    <EditText
+        android:layout_gravity="center"
+        android:elevation="2dp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/edit_shape"
+        android:hint="Diagnostic"
+        android:paddingTop="10dp"
+        android:id="@+id/edDesc"
+        android:paddingLeft="10dp"
+        android:gravity="top"
+        android:inputType="textPersonName"
+        android:textColor="@color/deep_blue"
+        android:textColorHint="@color/deep_blue"
+        android:layout_width="match_parent"
+        android:layout_height="450dp"/>
+
+
+
+    <Button
+        android:id="@+id/addButton"
+        android:elevation="2dp"
+        android:text="Add Patients"
+        android:textStyle="bold"
+        android:textColor="@color/white"
+        android:layout_marginTop="25dp"
+        android:textSize="18sp"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        android:background="@drawable/edit_shape"
+        android:layout_width="match_parent"
+        android:layout_height="55dp"/>
+
+
+</LinearLayout>

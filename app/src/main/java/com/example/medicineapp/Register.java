@@ -26,7 +26,7 @@ public class Register extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_register);
 
-        MyDbHelper dbHelper = new MyDbHelper(this, "medicine.db", null, 1);
+        MyDbHelper dbHelper = new MyDbHelper(this);
         db = dbHelper.getWritableDatabase();
 
         ImageView backButton = findViewById(R.id.back_button);
