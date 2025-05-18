@@ -39,42 +39,20 @@ public class Home extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-
         Cursor cursor = dbHelper.showData();
-
         while (cursor.moveToNext()){
-
-
             arrayList.add(new PatientModel(cursor.getString(1),cursor.getString(2),cursor.getInt(0)));
-
-
-
-
-
         }
-
-
-
         PatientAdepter adepter = new PatientAdepter(this,arrayList);
         recyclerView.setAdapter(adepter);
-
-
 
         floatingId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
 
-
                 startActivity(new Intent(Home.this, Patients.class));
-
             }
         });
-
-
-
-
-
-
     }
 
     @Override
