@@ -14,6 +14,8 @@ import android.widget.Toast;
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.util.Random;
+
 public class MainActivity extends AppCompatActivity {
     private SQLiteDatabase db;
     private MyDbHelper dbHelper;
@@ -24,6 +26,7 @@ public class MainActivity extends AppCompatActivity {
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
 
+        // Load and apply animations to UI elements
         ImageView loginImage = findViewById(R.id.loginImage);
         ImageView shapeImage = findViewById(R.id.shape);
 
@@ -33,6 +36,7 @@ public class MainActivity extends AppCompatActivity {
         loginImage.startAnimation(fadeInOnce);
         shapeImage.startAnimation(rotateForever);
 
+        // Buttons for register and forgot password
         Button register = findViewById(R.id.button_register);
         register.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, Register.class);
@@ -45,31 +49,29 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
+        // Initialize database
         dbHelper = new MyDbHelper(this);
         db = dbHelper.getWritableDatabase();
 
+        // Login button logic
         Button login = findViewById(R.id.button_login);
         login.setOnClickListener(v -> {
             EditText email = findViewById(R.id.input_userEmail);
-            String emailText = email.getText().toString();
-
             EditText password = findViewById(R.id.input_password);
+
+            String emailText = email.getText().toString();
             String passwordText = password.getText().toString();
 
-            if (emailText.isEmpty() && passwordText.isEmpty()) {
-                Toast.makeText(this, "Please Enter Your Email And Password", Toast.LENGTH_SHORT).show();
+            if (emailText.isEmpty() || passwordText.isEmpty()) {
+                Toast.makeText(this, "Please enter your email and password", Toast.LENGTH_SHORT).show();
                 return;
             }
 
+            // Hash the password
             String hashedPassword = PasswordHasher.generateHash(passwordText);
 
-            String[] projection = {
-                    "id",
-                    "fullName",
-                    "userEmail",
-                    "password"
-            };
-
+            // Query user by email and hashed password
+            String[] projection = {"id", "fullName", "userEmail", "password"};
             String selection = "userEmail = ? AND password = ?";
             String[] selectionArgs = {emailText, hashedPassword};
 
@@ -86,16 +88,40 @@ public class MainActivity extends AppCompatActivity {
             if (cursor.getCount() > 0) {
                 cursor.moveToFirst();
                 String fullName = cursor.getString(cursor.getColumnIndexOrThrow("fullName"));
-                Toast.makeText(this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
                 int userId = cursor.getInt(cursor.getColumnIndexOrThrow("id"));
-                Intent intent = new Intent(MainActivity.this, Home.class);
-                intent.putExtra("userId", userId);
-                startActivity(intent);
 
+                Toast.makeText(this, "Welcome " + fullName, Toast.LENGTH_SHORT).show();
+
+                // Generate OTP
+                String generatedOtp = generateOtp();
+
+                // Send OTP to email using MailSender
+                new Thread(() -> {
+                    try {
+                        MailSender mailSender = new MailSender();
+                        mailSender.sendOtpEmail(emailText, generatedOtp);
+
+                        // Switch to VerifyActivity with email and OTP
+                        runOnUiThread(() -> {
+                            Intent intent = new Intent(MainActivity.this, VerifyActivity.class);
+                            intent.putExtra("email", emailText);
+                            intent.putExtra("otp", generatedOtp);
+                            intent.putExtra("userId", userId); // Optional: pass userId if needed
+                            startActivity(intent);
+                        });
+
+                    } catch (Exception e) {
+                        runOnUiThread(() ->
+                                Toast.makeText(MainActivity.this, "Failed to send OTP email", Toast.LENGTH_SHORT).show());
+                        e.printStackTrace();
+                    }
+                }).start();
+
+                // Clear input fields
                 email.setText("");
                 password.setText("");
             } else {
-                Toast.makeText(this, "Invalid Email or Password", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Invalid email or password", Toast.LENGTH_SHORT).show();
                 password.setText("");
             }
 
@@ -103,6 +129,12 @@ public class MainActivity extends AppCompatActivity {
                 cursor.close();
             }
         });
+    }
+
+    // Generate a random 6-digit OTP
+    private String generateOtp() {
+        Random random = new Random();
+        return String.format("%06d", random.nextInt(1000000));
     }
 
     @Override

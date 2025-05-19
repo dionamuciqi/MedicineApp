@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -14,7 +15,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.MedicineApp"
         tools:targetApi="31">
-
+        <activity
+            android:name=".SuccessActivity"
+            android:exported="false" />
+        <activity
+            android:name=".VerifyActivity"
+            android:exported="false" />
         <activity
             android:name=".UpdateActivity3"
             android:exported="false" />
@@ -23,9 +29,6 @@
             android:exported="false" />
         <activity
             android:name=".Patients"
-            android:exported="false" />
-        <activity
-            android:name=".AdminActivity"
             android:exported="false" />
         <activity
             android:name=".Home"
@@ -44,12 +47,10 @@
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!-- Këtu regjistrojmë AlarmReceiver -->
-        <receiver android:name=".AlarmReceiver" android:exported="false" />
 
     </application>
 

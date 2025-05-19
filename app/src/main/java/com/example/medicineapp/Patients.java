@@ -63,7 +63,7 @@ public class Patients extends AppCompatActivity {
                     edName.setText("");
                     edDesc.setText("");
 
-                    // Kalo userId te Home activity
+                    // userId te Home activity
                     Intent intent = new Intent(Patients.this, Home.class);
                     intent.putExtra("userId", userId);
                     startActivity(intent);
