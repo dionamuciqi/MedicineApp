@@ -2,7 +2,6 @@ package com.example.medicineapp;
 
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.view.View;
 import android.view.WindowManager;
@@ -22,7 +21,6 @@ public class Home extends AppCompatActivity {
     FloatingActionButton floatingId;
     RecyclerView recyclerView;
     ArrayList<PatientModel> arrayList = new ArrayList<>();
-    private SQLiteDatabase db;
     private MyDbHelper dbHelper;
     private int userId;
 
@@ -39,32 +37,36 @@ public class Home extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-
+        // Merr userId nga intent
         userId = getIntent().getIntExtra("userId", -1);
 
         if (userId == -1) {
-            Toast.makeText(this, "Gabim: userId mungon!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Error: userId is missing!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
 
+        // Merr pacientët vetëm për userId-në në fjalë
         Cursor cursor = dbHelper.getPatientsByUserId(userId);
         while (cursor.moveToNext()) {
             arrayList.add(new PatientModel(
                     cursor.getString(cursor.getColumnIndexOrThrow("fullname")),
                     cursor.getString(cursor.getColumnIndexOrThrow("diagnostic")),
-                    cursor.getInt(cursor.getColumnIndexOrThrow("id"))
+                    cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                    userId
             ));
         }
+        cursor.close();
 
-        PatientAdepter adepter = new PatientAdepter(this, arrayList);
-        recyclerView.setAdapter(adepter);
+        // Krijo adapterin me userId
+        PatientAdepter adapter = new PatientAdepter(this, arrayList, userId);
+        recyclerView.setAdapter(adapter);
 
         floatingId.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(Home.this, Patients.class);
-                intent.putExtra("userId", userId);
+                intent.putExtra("userId", userId);  // kalojmë userId tek Patients
                 startActivity(intent);
             }
         });

@@ -1,31 +1,31 @@
 package com.example.medicineapp;
 
 public class PatientModel {
-    String fullname,diagnostic;
+    private String fullname;
+    private String diagnostic;
+    private int id;
+    private int userId;
 
-    int id;
-
-
-    public PatientModel(String fullname, String diagnostic, int id) {
+    public PatientModel(String fullname, String diagnostic, int id, int userId) {
         this.fullname = fullname;
         this.diagnostic = diagnostic;
         this.id = id;
+        this.userId = userId;
     }
 
-
-    public String getfullname() {
+    public String getFullname() {
         return fullname;
     }
 
-    public void setfullname(String fullname) {
+    public void setFullname(String fullname) {
         this.fullname = fullname;
     }
 
-    public String getdiagnostic() {
+    public String getDiagnostic() {
         return diagnostic;
     }
 
-    public void setDescription(String diagnostic) {
+    public void setDiagnostic(String diagnostic) {
         this.diagnostic = diagnostic;
     }
 
@@ -37,6 +37,11 @@ public class PatientModel {
         this.id = id;
     }
 
+    public int getUserId() {
+        return userId;
+    }
 
+    public void setUserId(int userId) {
+        this.userId = userId;
+    }
 }
-

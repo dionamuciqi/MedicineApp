@@ -19,10 +19,13 @@ public class PatientAdepter extends RecyclerView.Adapter<PatientAdepter.ViewHold
 
     Context context;
     ArrayList<PatientModel> arrayList = new ArrayList<>();
+    int userId;  // Ruaj userId për përdorim
 
-    public PatientAdepter(Context context, ArrayList<PatientModel> arrayList) {
+    // Konstruktor i ri që pranon userId
+    public PatientAdepter(Context context, ArrayList<PatientModel> arrayList, int userId) {
         this.context = context;
         this.arrayList = arrayList;
+        this.userId = userId;
     }
 
     @NonNull
@@ -34,51 +37,42 @@ public class PatientAdepter extends RecyclerView.Adapter<PatientAdepter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull PatientAdepter.ViewHolder holder, int position) {
-        holder.tvTitle.setText(arrayList.get(position).getfullname());
-        holder.tvDesc.setText(arrayList.get(position).getdiagnostic());
+        holder.tvTitle.setText(arrayList.get(position).getFullname());
+        holder.tvDesc.setText(arrayList.get(position).getDiagnostic());
 
-        holder.cardView.setOnLongClickListener(new View.OnLongClickListener() {
-            @Override
-            public boolean onLongClick(View view) {
-                int currentPosition = holder.getAdapterPosition();
-                if (currentPosition != RecyclerView.NO_POSITION) {
-                    new AlertDialog.Builder(context)
-                            .setTitle("Delete Entry")
-                            .setMessage("Are you sure want to delete this entry?")
-                            .setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    MyDbHelper dbHelper = new MyDbHelper(context);
-                                    String id = String.valueOf(arrayList.get(currentPosition).getId());
-                                    dbHelper.deletePatient(id);
-                                    dialogInterface.dismiss();
-                                    context.startActivity(new Intent(context, Home.class));
-                                }
-                            })
-                            .setNegativeButton("CANCEL", new DialogInterface.OnClickListener() {
-                                @Override
-                                public void onClick(DialogInterface dialogInterface, int i) {
-                                    dialogInterface.dismiss();
-                                }
-                            })
-                            .setIcon(R.drawable.baseline_add_alert_24)
-                            .show();
-                }
-                return false;
+        holder.cardView.setOnLongClickListener(view -> {
+            int currentPosition = holder.getAdapterPosition();
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                new AlertDialog.Builder(context)
+                        .setTitle("Delete Entry")
+                        .setMessage("Are you sure want to delete this entry?")
+                        .setPositiveButton("OK", (dialogInterface, i) -> {
+                            MyDbHelper dbHelper = new MyDbHelper(context);
+                            String id = String.valueOf(arrayList.get(currentPosition).getId());
+                            dbHelper.deletePatient(id);
+                            dialogInterface.dismiss();
+
+                            // Rifresko aktivitetin Home duke kaluar userId
+                            Intent intent = new Intent(context, Home.class);
+                            intent.putExtra("userId", userId);
+                            context.startActivity(intent);
+                        })
+                        .setNegativeButton("CANCEL", (dialogInterface, i) -> dialogInterface.dismiss())
+                        .setIcon(R.drawable.baseline_add_alert_24)
+                        .show();
             }
+            return true;
         });
 
-        holder.cardView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                int currentPosition = holder.getAdapterPosition();
-                if (currentPosition != RecyclerView.NO_POSITION) {
-                    Intent intent = new Intent(context, UpdateActivity3.class);
-                    intent.putExtra("fullname", arrayList.get(currentPosition).getfullname());
-                    intent.putExtra("diagnostic", arrayList.get(currentPosition).getdiagnostic());
-                    intent.putExtra("id", arrayList.get(currentPosition).getId());
-                    context.startActivity(intent);
-                }
+        holder.cardView.setOnClickListener(view -> {
+            int currentPosition = holder.getAdapterPosition();
+            if (currentPosition != RecyclerView.NO_POSITION) {
+                Intent intent = new Intent(context, UpdateActivity3.class);
+                intent.putExtra("fullname", arrayList.get(currentPosition).getFullname());
+                intent.putExtra("diagnostic", arrayList.get(currentPosition).getDiagnostic());
+                intent.putExtra("id", arrayList.get(currentPosition).getId());
+                intent.putExtra("userId", userId);  // kalojmë userId edhe në UpdateActivity3
+                context.startActivity(intent);
             }
         });
     }
